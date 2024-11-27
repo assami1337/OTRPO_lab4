@@ -68,9 +68,11 @@ if __name__ == "__main__":
         "subscriptions_pages": subscriptions_pages_data
     }
 
-    output_file = f"user_id{USER_ID}.json"
-    if not os.path.exists(output_file):
-        open(output_file, 'w').close()
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+
+    output_file = os.path.join(OUTPUT_DIR, f"user_id{USER_ID}.json")
+
     with open(output_file, "w", encoding="utf-8") as file:
         json.dump(result, file, indent=4, ensure_ascii=False)
-    print(f"Данные сохранены в user_id{USER_ID}.json")
+    print(f"Данные сохранены в {output_file}")
