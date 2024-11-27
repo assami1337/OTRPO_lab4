@@ -68,7 +68,9 @@ if __name__ == "__main__":
         "subscriptions_pages": subscriptions_pages_data
     }
 
-    with open(f"user_id{USER_ID}.json", "w", encoding="utf-8") as file:
-        json.dump(result, file, indent=4, ensure_ascii=False)
+    output_file = f"user_id{USER_ID}.json"
+    if not os.path.exists(output_file):
+        open(output_file, 'w').close()
+    with open(output_file, "w", encoding="utf-8") as file:
 
     print(f"Данные сохранены в user_id{USER_ID}.json")
