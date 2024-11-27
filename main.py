@@ -4,6 +4,7 @@ import os
 
 TOKEN = os.getenv("TOKEN")
 USER_ID = "404727166"
+OUTPUT_DIR = "/app/output"
 
 def get_followers():
     response = requests.get("https://api.vk.com/method/users.getFollowers",
