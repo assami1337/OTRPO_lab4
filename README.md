@@ -8,7 +8,7 @@ docker run --rm -e TOKEN=<ВАШ_ТОКЕН> -v %cd%:/app assami1337/otrpo_lab3:
 ### PowerShell:
 docker run --rm -e TOKEN=<ВАШ_ТОКЕН> -v ${PWD}:/app assami1337/otrpo_lab3:latest
 
-##После выполнения контейнера файл user_id404727166.json будет создан в текущей директории.
+## После выполнения контейнера файл user_id404727166.json будет создан в текущей директории.
 
 # Просмотр файла:
 ## Linux/macOS:
