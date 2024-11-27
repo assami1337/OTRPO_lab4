@@ -22,11 +22,11 @@ cat user_id404727166.json
 ## Windows
 ### cmd:
 ```cmd
-type user_id404727166.json
+chcp 65001 >nul & type user_id404727166.json
 ```
 ### PowerShell:
 ```powershell
-Get-Content user_id404727166.json
+Get-Content user_id404727166.json -Encoding UTF8
 ```
 # Удаление 
 ## Linux/macOS:
