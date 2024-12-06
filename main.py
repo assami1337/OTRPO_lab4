@@ -8,14 +8,11 @@ import sys
 import os
 import argparse
 
-# Настройка логирования
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# Загрузка переменных окружения из файла .env
 load_dotenv()
 
-# Версия API VK
 API_VERSION = "5.199"
 
 async def get_user_info(user_id, params, session):
@@ -75,55 +72,42 @@ async def process_user(user_id, params, session, driver, current_depth, max_dept
         return
     processed_users_fetch.add(user_id)
 
-    # Получаем информацию о пользователе
     user_info = await get_user_info(user_id, params, session)
     if not user_info:
         return
 
-    # Сохраняем пользователя в Neo4j
     save_user_to_neo4j(user_info, driver, processed_users_save)
 
-    # Получаем фолловеров
     followers = await get_followers(user_id, params, session)
 
     for follower in followers:
         follower_id = int(follower['id'])
-        # Сохраняем фолловера в Neo4j
         save_user_to_neo4j(follower, driver, processed_users_save)
-        # Создаём связь Follow
         save_follow_relationship(follower_id, user_id, driver)
-        # Рекурсивно обрабатываем фолловера
-        await asyncio.sleep(0.34)  # Учитываем ограничения VK API
+        await asyncio.sleep(0.34)
         await process_user(follower_id, params, session, driver, current_depth + 1, max_depth, processed_users_fetch, processed_users_save, processed_groups)
 
-    # Получаем подписки (на пользователей и группы)
     subscriptions = await get_subscriptions(user_id, params, session)
 
     for item in subscriptions:
         item_type = item.get('type')
         if item_type == 'profile':
-            # Это подписка на пользователя
             sub_user_id = int(item['id'])
-            # Сохраняем пользователя в Neo4j
             save_user_to_neo4j(item, driver, processed_users_save)
-            # Создаём связь Subscribe от текущего пользователя к другому пользователю
             save_subscribe_relationship_to_user(user_id, sub_user_id, driver)
             logger.debug(f"Связь Subscribe от пользователя {user_id} к пользователю {sub_user_id} создана")
         elif item_type in ('group', 'page'):
-            # Это подписка на группу
             group_id = int(item['id'])
             if group_id in processed_groups:
                 continue
             processed_groups.add(group_id)
-            # Сохраняем группу в Neo4j
             save_group_to_neo4j(item, driver)
-            # Создаём связь Subscribe от текущего пользователя к группе
             save_subscribe_relationship_to_group(user_id, group_id, driver)
             logger.debug(f"Связь Subscribe от пользователя {user_id} к группе {group_id} создана")
         else:
             logger.warning(f"Неизвестный тип подписки {item_type} для элемента {item}")
 
-        await asyncio.sleep(0.34)  # Учитываем ограничения VK API
+        await asyncio.sleep(0.34)
 
 def save_user_to_neo4j(user_info, driver, processed_users_save):
     """Сохраняет пользователя в Neo4j"""
